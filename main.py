@@ -3,15 +3,25 @@ from data import dataAwal, centroidLama, k, centroidAwal
 
 def tampilDataAwal(data):
     print("\n========== DATA BELUM DIOLAH ==========")
-    for i in data:
-        print("\nNama     :", i[0])
-        print("Data     :", i[1])
-        print("Cluster  :", i[2])
+    print("+----+-----------------+-----------------+---------+")
+    print("| No | Nama            | Data            | Cluster |")
+    print("+----+-----------------+-----------------+---------+")
+
+    for no, i in enumerate(data, start=1):
+        print(f"| {no:<2} | {i[0]:<15} | {str(i[1]):<15} | {i[2]+1:<7} |")
+
+    print("+----+-----------------+-----------------+---------+")
         
 def tampilCentroid(centroid):
     print("\n========== CENTROID ==========")
+    print("+-----------+-----------------+")
+    print("| Centroid  | Nilai           |")
+    print("+-----------+-----------------+")
+
     for i in range(len(centroid)):
-        print("Centroid", i, ":", centroid[i])
+        print(f"| C{i+1:<8} | {str(centroid[i]):<15} |")
+
+    print("+-----------+-----------------+")
         
 def jarak(a, b):
     
@@ -57,16 +67,28 @@ def prosesKMeans(data, centroid, iterasi):
                 daftarJarak.append(jarak(titik[1], c))
             clusterTerdekat = daftarJarak.index(min(daftarJarak))
             cluster.append(clusterTerdekat)
-            
+
+        print("+----------------+-----------------+-----------+")
+        print("| Nama           | Data            | Cluster   |")
+        print("+----------------+-----------------+-----------+")
+        
         for i in range(len(data)):
             data[i][2] = cluster[i]
-            print(data[i][0], "masuk Cluster", data[i][2] + 1)
+            print(f"| {data[i][0]:<14} | {str(data[i][1]):<15} | Cluster {data[i][2]+1} |")
 
+        print("+----------------+-----------------+-----------+")
+        
         centroidBaru = hitungCentroid(data, cluster, k, centroidBaru)
         print("\nCentroid Baru:")
         
-        for c in centroidBaru:
-            print(c)
+        print("+-----------+-----------------+")
+        print("| Centroid  | Nilai           |")
+        print("+-----------+-----------------+")
+
+        for i, c in enumerate(centroidBaru):
+            print(f"| C{i+1:<8} | {str(c):<15} |")
+
+        print("+-----------+-----------------+")
 
     return dataAkhir(data, centroidBaru), centroidBaru
 
@@ -87,11 +109,15 @@ def tampilDataAkhir(hasil):
         print("\n====================")
         print("CLUSTER", i+1)
         print("====================")
+        
+        print("+----------------+-----------------+-----------------+")
+        print("| Nama           | Data            | Centroid       |")
+        print("+----------------+-----------------+-----------------+")
+
         for data in hasil[i]:
-            print("Nama      :", data[0])
-            print("Data      :", data[1])
-            print("Centroid  :", data[2])
-            print()
+            print(f"| {data[0]:<14} | {str(data[1]):<15} | {str(data[2]):<15} |")
+
+        print("+----------------+-----------------+-----------------+")
 
 
 def tampilPositifNegatif(hasil):
@@ -120,33 +146,33 @@ def tampilPositifNegatif(hasil):
 
     semuaData.sort(key=lambda x: x["rata"])
 
-    print("\n--------------------------------------------")
-    print("  DATA PALING NEGATIF (Rata-Rata Terendah)")
-    print("--------------------------------------------")
+    print("\n======== DATA PALING NEGATIF (Rata-Rata Terendah) ========")
+    print("+----------------+-----------------+------------+---------+")
+    print("| Nama           | Data            | Rata-rata | Cluster |")
+    print("+----------------+-----------------+------------+---------+")
+    
     nilaiTerendah = semuaData[0]["rata"]
     for d in semuaData:
         if d["rata"] == nilaiTerendah:
-            print(f"  Nama     : {d['nama']}")
-            print(f"  Data     : {d['nilai']}")
-            print(f"  Rata-Rata: {d['rata']:.2f}")
-            print(f"  Cluster  : {d['cluster']}")
+            print(f"| {d['nama']:<14} | {str(d['nilai']):<15} | {d['rata']:<10.2f} | {d['cluster']:<7} |")
         else:
             break
+
+    print("+----------------+-----------------+------------+---------+")
 
     print("\n  [ Peringkat Bawah - 3 Terendah ]")
     for i, d in enumerate(semuaData[:3]):
         print(f"  {i+1}. {d['nama']:<20} | Rata-Rata: {d['rata']:.2f} | Cluster: {d['cluster']}")
 
-    print("\n--------------------------------------------")
-    print("  DATA PALING POSITIF (Rata-Rata Tertinggi)")
-    print("--------------------------------------------")
+    print("\n======== DATA PALING POSITIF (Rata-Rata Tertinggi) ========")
+    print("+----------------+-----------------+------------+---------+")
+    print("| Nama           | Data            | Rata-rata | Cluster |")
+    print("+----------------+-----------------+------------+---------+")
+    
     nilaiTertinggi = semuaData[-1]["rata"]
     for d in reversed(semuaData):
         if d["rata"] == nilaiTertinggi:
-            print(f"  Nama     : {d['nama']}")
-            print(f"  Data     : {d['nilai']}")
-            print(f"  Rata-Rata: {d['rata']:.2f}")
-            print(f"  Cluster  : {d['cluster']}")
+            print(f"| {d['nama']:<14} | {str(d['nilai']):<15} | {d['rata']:<10.2f} | {d['cluster']:<7} |")
         else:
             break
 
@@ -154,14 +180,17 @@ def tampilPositifNegatif(hasil):
     for i, d in enumerate(reversed(semuaData[-3:])):
         print(f"  {i+1}. {d['nama']:<20} | Rata-Rata: {d['rata']:.2f} | Cluster: {d['cluster']}")
 
-    print("\n--------------------------------------------")
-    print("  RATA-RATA PER CLUSTER")
-    print("--------------------------------------------")
+    print("\n======= RATA-RATA PER CLUSTER =======")
+    print("+-----------+-------------+----------+")
+    print("| Cluster   | Rata-rata  | Anggota  |")
+    print("+-----------+-------------+----------+")
     for clusterIdx in range(len(hasil)):
         anggotaCluster = [d for d in semuaData if d["cluster"] == clusterIdx + 1]
         if anggotaCluster:
             rataCluster = sum(d["rata"] for d in anggotaCluster) / len(anggotaCluster)
-            print(f"  Cluster {clusterIdx+1}: {rataCluster:.2f}  ({len(anggotaCluster)} anggota)")
+            print(f"| {clusterIdx+1:<9} | {rataCluster:<11.2f} | {len(anggotaCluster):<8} |")
+
+    print("+-----------+-------------+----------+")
 
 
 def tampilDataPerPertanyaan(data):
@@ -191,16 +220,22 @@ def tampilDataPerPertanyaan(data):
 
             print(f"\n  [{nilai}] {labelJawaban[nilai]} :")
 
+            print("+----------------------+")
+            print("| Nama                 |")
+            print("+----------------------+")
+
             ada = False
 
             for i in data:
 
                 if i[1][kolom] == nilai:
-                    print(f"    - {i[0]}")
+                    print(f"| {i[0]:<20} |")
                     ada = True
 
             if not ada:
-                print("    (tidak ada)")
+                print("| Tidak ada            |")
+
+            print("+----------------------+")
 
 
 # Inisialisasi sebelum menu
