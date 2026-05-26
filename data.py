@@ -36,14 +36,10 @@ dataAwal = [
 
 k = 3
 
-centroidAwal = [
+centroid = [
     [5, 4, 5],
     [3, 3, 3],
     [1, 1, 5],
 ]
 
 
-centroidLama = [
-    round(sum(c) / len(c), 2)
-    for c in centroidAwal
-]
