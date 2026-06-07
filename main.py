@@ -194,60 +194,102 @@ def visualisasiCluster(hasil):
     
     
 # ── Evaluasi Model dengan Silhouette Score ───────────────────────────────────
-def silhouetteScore(data, centroidAkhir):
+def evaluasiModel(data, centroidAkhir, k):
+
+    print("\n================ HASIL EVALUASI CLUSTER =================")
+
+    print("+-----------+--------------+------------+------------------------------------------+")
+    print("| Cluster   | Jumlah Data  | Silhouette | Karakteristik Utama                      |")
+    print("+-----------+--------------+------------+------------------------------------------+")
+
     totalScore = 0
 
-    for row in data:
+    for clusterID in range(k):
 
-        # cluster data saat ini
-        clusterSaatIni = row[2]
+        anggota = [row for row in data if row[2] == clusterID]
 
-        # a = jarak ke centroid cluster sendiri
-        a = euclidean(
-            row[1],
-            centroidAkhir[clusterSaatIni]
+        jumlahData = len(anggota)
+
+        # hitung silhouette rata-rata cluster
+        totalCluster = 0
+
+        for row in anggota:
+
+            a = euclidean(
+                row[1],
+                centroidAkhir[clusterID]
+            )
+
+            b = float("inf")
+
+            for i in range(len(centroidAkhir)):
+
+                if i != clusterID:
+
+                    jarakLain = euclidean(
+                        row[1],
+                        centroidAkhir[i]
+                    )
+
+                    if jarakLain < b:
+                        b = jarakLain
+
+            if max(a, b) == 0:
+                s = 0
+            else:
+                s = (b - a) / max(a, b)
+
+            totalCluster += s
+
+        silhouetteCluster = (
+            totalCluster / jumlahData
+            if jumlahData > 0 else 0
         )
 
-        # b = jarak terdekat ke centroid cluster lain
-        b = float("inf")
+        totalScore += totalCluster
 
-        for i in range(len(centroidAkhir)):
+        # karakteristik cluster berdasarkan centroid
+        centroid = centroidAkhir[clusterID]
 
-            if i != clusterSaatIni:
+        karakteristik = []
 
-                jarakClusterLain = euclidean(
-                    row[1],
-                    centroidAkhir[i]
-                )
+        for i, nilai in enumerate(centroid):
 
-                if jarakClusterLain < b:
-                    b = jarakClusterLain
+            if nilai >= 0.70:
+                karakteristik.append(f"V{i+1} Tinggi")
 
-        # hitung silhouette score data
-        if max(a, b) == 0:
-            s = 0
-        else:
-            s = (b - a) / max(a, b)
+            elif nilai >= 0.40:
+                karakteristik.append(f"V{i+1} Sedang")
 
-        totalScore += s
+            else:
+                karakteristik.append(f"V{i+1} Rendah")
 
-    scoreAkhir = totalScore / len(data)
+        deskripsi = ", ".join(karakteristik)
 
-    print("\n========== EVALUASI MODEL ==========")
-    print(f"Silhouette Score = {scoreAkhir:.4f}")
+        print(
+            f"| Cluster {clusterID+1:<2} | "
+            f"{jumlahData:^12} | "
+            f"{silhouetteCluster:^10.4f} | "
+            f"{deskripsi:<40} |"
+        )
 
-    if scoreAkhir >= 0.71:
-        kualitas = "Sangat Baik"
-    elif scoreAkhir >= 0.51:
-        kualitas = "Baik"
-    elif scoreAkhir >= 0.26:
-        kualitas = "Cukup"
+    print("+-----------+--------------+------------+------------------------------------------+")
+
+    silhouetteTotal = totalScore / len(data)
+
+    print(f"\nSilhouette Score Keseluruhan : {silhouetteTotal:.4f}")
+
+    if silhouetteTotal >= 0.71:
+        print("Kualitas Cluster : Sangat Baik")
+
+    elif silhouetteTotal >= 0.51:
+        print("Kualitas Cluster : Baik")
+
+    elif silhouetteTotal >= 0.26:
+        print("Kualitas Cluster : Cukup")
+
     else:
-        kualitas = "Kurang"
-
-    print(f"Kualitas Cluster : {kualitas}")
-
-    return scoreAkhir
+        print("Kualitas Cluster : Kurang")
 
 
 # ── Menu utama ────────────────────────────────────────────────────────────────
@@ -295,7 +337,7 @@ while True:
         if not hasilCluster:
             print("\n[!] Jalankan proses K-Means terlebih dahulu.")
         else:
-            silhouetteScore(dataSiap, centroidAkhir)
+            evaluasiModel(dataSiap, centroidAkhir, k))
     elif pilih == 8:
         cariAnomali(dataSiap, centroidAkhir, k)
     elif pilih == 0:
