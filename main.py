@@ -337,7 +337,7 @@ while True:
         if not hasilCluster:
             print("\n[!] Jalankan proses K-Means terlebih dahulu.")
         else:
-            evaluasiModel(dataSiap, centroidAkhir, k))
+            evaluasiModel(dataSiap, centroidAkhir, k)
     elif pilih == 8:
         cariAnomali(dataSiap, centroidAkhir, k)
     elif pilih == 0:
