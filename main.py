@@ -3,19 +3,23 @@ from data import dataAwal, dataSiap, k, centroid
 import matplotlib.pyplot as plt    # library untuk menampilkan bar chrat
 
 
-# ── Euclidean Distance ────────────────────────────────────────────────────────
+# Euclidean Distance -> untuk menghitung jarak  
 def euclidean(a, b):
-    # hitung selisih kuadrat tiap dimensi lalu jumlahkan
+    # total buat naro hasil dari perjumlahan rumus nya 
     total = 0
+    # ini buat luping sebanyak jumlah di mensi data 
     for i in range(len(a)):
+        # ini buat nge jumlahin rumus nya
         total += (a[i] - b[i]) ** 2
     # akar kuadrat dari total selisih kuadrat
     return math.sqrt(total)
 
 
-# ── Hitung centroid baru dengan mean ─────────────────────────────────────────
+#  Hitung centroid baru dengan mean 
 def hitungCentroid(data, cluster, k, centroidLama):
+    # ini list buat menyimpan centroid baru nya 
     centroidBaru = []
+    # untuk melakukan perulangan sebanyak jumlah k yang di hitung menggunaka fungsi rules of tomnb
     for i in range(k):
         # kumpulkan semua anggota cluster i
         anggota = [data[j][1] for j in range(len(data)) if cluster[j] == i]
@@ -290,6 +294,74 @@ def evaluasiModel(data, centroidAkhir, k):
 
     else:
         print("Kualitas Cluster : Kurang")
+      
+      
+def histogramEDA(data):
+
+    atribut = [
+        "Menambah Pengalaman",
+        "Menambah Relasi",
+        "Meningkatkan Prestasi Akademik"
+    ]
+
+    for kolom in range(3):
+
+        nilai = [
+            row[1][kolom]
+            for row in data
+        ]
+
+        plt.figure()
+
+        plt.hist(
+            nilai,
+            bins=5
+        )
+
+        plt.title(
+            atribut[kolom]
+        )
+
+        plt.xlabel("Skor")
+        plt.ylabel("Frekuensi")
+
+        plt.show()  
+def statistikDeskriptif(data):
+
+    atribut = [
+        "Menambah Pengalaman",
+        "Menambah Relasi",
+        "Meningkatkan Prestasi Akademik"
+    ]
+
+    print("\n========== STATISTIK DESKRIPTIF ==========")
+
+    for kolom in range(3):
+
+        nilai = [
+            row[1][kolom]
+            for row in data
+        ]
+
+        mean = sum(nilai)/len(nilai)
+
+        urut = sorted(nilai)
+
+        median = urut[len(nilai)//2]
+
+        varian = sum(
+            (x-mean)**2
+            for x in nilai
+        ) / len(nilai)
+
+        std = math.sqrt(varian)
+
+        print("\n",atribut[kolom])
+        print("Mean     :",round(mean,4))
+        print("Median   :",median)
+        print("Std Dev  :",round(std,4))
+        print("Minimum  :",min(nilai))
+        print("Maximum  :",max(nilai))
 
 
 # ── Menu utama ────────────────────────────────────────────────────────────────
@@ -307,6 +379,8 @@ while True:
     print("6. Visualisasi Hasil Clustering")
     print("7. Evaluasi Model")
     print("8. Cari Data Anomali")
+    print("9. HistogramEDA")
+    print("10. StatistikDeskriptif")
     print("0. Keluar")
 
     try:
@@ -340,6 +414,10 @@ while True:
             evaluasiModel(dataSiap, centroidAkhir, k)
     elif pilih == 8:
         cariAnomali(dataSiap, centroidAkhir, k)
+    elif pilih == 9:
+        histogramEDA(dataAwal)
+    elif pilih == 10:
+        statistikDeskriptif(dataAwal)
     elif pilih == 0:
         print("Program selesai")
         break
